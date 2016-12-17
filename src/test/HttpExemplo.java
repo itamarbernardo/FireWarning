@@ -15,6 +15,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -26,62 +28,24 @@ public class HttpExemplo {
 
     public static void main(String[] args) throws Exception {
 
-        HttpExemplo http = new HttpExemplo();
-        String url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=Seattle&destinations=San+Francisco&key=AIzaSyDxSPaFPYw4VHoODgbDcoRWjj68zeUkEu8";
-//        String url = "http://localhost:8084/VideoAulaWebServices/webresources/aulaws/usuario/get";
+        String url = "http://192.168.0.101:8084/MyNewHome/webresources/sensor?sensorId=2";
+        Acesso a = new Acesso(url);
+        a.start();
         System.out.println("Testing 1 - Send Http GET request");
-        String json = http.sendGet(url);
 
-//        System.out.println(json);
+        while (true) {
+            try {
+                String json = a.sendGet();
+                System.out.println("Resultado: " + json);
+                Thread.sleep(500);
 
-        Gson g = new Gson();
-        Distancia distancia = new Distancia();
-        Duracao duracao = new Duracao();
-        Elementos elementos = new Elementos(distancia, duracao);
-        List<Rows> rows = new ArrayList<>();
-        Localization l = new Localization(rows);
-//        Usuario u = new Usuario();
-       java.lang.reflect.Type localiza = new TypeToken<Localization>(){}.getType();
-//       java.lang.reflect.Type typeUsuario = new TypeToken<Usuario>() {
-        l = g.fromJson(json, localiza);
-//        u = g.fromJson(json, typeUsuario);
-       System.out.println("Status :" + l.getStatus());
-       //System.out.println("Endereço :" + l.getEnderecoAtual().toString());
-       System.out.println("Tempo :" + l.getRows().toString());
-       
-//        System.out.println("Usuario:" + u.getLogin());
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Acesso.class.getName()).log(Level.SEVERE, null, ex);
 
-    }
-
-    // HTTP GET request
-    private String sendGet(String url) throws Exception {
-
-        //String url = "http://www.nanonull.com/TimeService/TimeService.asmx?op=getUTCTime";
-        URL obj = new URL(url);
-        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-
-        // optional default is GET
-        con.setRequestMethod("GET");
-
-        //add request header
-        con.setRequestProperty("User-Agent", USER_AGENT);
-
-        int responseCode = con.getResponseCode();
-        System.out.println("\nSending 'GET' request to URL : " + url);
-        System.out.println("Response Code : " + responseCode);
-
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(con.getInputStream()));
-        String inputLine;
-        StringBuffer response = new StringBuffer();
-
-        while ((inputLine = in.readLine()) != null) {
-            response.append(inputLine);
+            } catch (Exception ex) {
+                Logger.getLogger(Acesso.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
-        in.close();
-
-        //print result
-        return response.toString();
 
     }
 
